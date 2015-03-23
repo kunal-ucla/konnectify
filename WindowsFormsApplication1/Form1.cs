@@ -11,6 +11,10 @@ using System.Diagnostics;
 using System.Threading;
 using System.Security.Permissions;
 using System.Security.Principal;
+using System.Windows.Forms;
+using MySql.Data.MySqlClient;
+using System.Data.SqlClient;
+
 
 namespace WindowsFormsApplication1
 {
@@ -28,14 +32,62 @@ namespace WindowsFormsApplication1
             {
                 RestartElevated();
             }
+            SqlConnection cn2 = new SqlConnection(global::WindowsFormsApplication1.Properties.Settings.Default.Database1ConnectionString);
+
+            try
+            {
+                string sql2 = "SELECT Ssid FROM History WHERE Id=1";
+                string sql3 = "SELECT [Key] FROM History WHERE Id=1";
+                SqlCommand exeSql2 = new SqlCommand(sql2, cn2);
+                SqlCommand exeSql3 = new SqlCommand(sql3, cn2);
+                cn2.Open();
+                username.Text = (string)exeSql2.ExecuteScalar();
+                password.Text = (string)exeSql3.ExecuteScalar();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                cn2.Close();
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            string ssid = textBox1.Text, key = textBox2.Text;
+            SqlConnection cn2 = new SqlConnection(global::WindowsFormsApplication1.Properties.Settings.Default.Database1ConnectionString);
+
+            try
+            {
+                string sql2 = "SELECT Ssid FROM History WHERE Id=1";
+                string sql3 = "SELECT [Key] FROM History WHERE Id=1";
+                SqlCommand exeSql2 = new SqlCommand(sql2, cn2);
+                SqlCommand exeSql3 = new SqlCommand(sql3, cn2);
+                cn2.Open();
+                username.Text = (string)exeSql2.ExecuteScalar();
+                password.Text = (string)exeSql3.ExecuteScalar();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                cn2.Close();
+            }
+            /*SqlConnection con = new SqlConnection(@"Data Source=(LocalDB)\v11.0;AttachDbFilename=C:\Users\Kunal\Documents\Data.mdf;Integrated Security=True;Connect Timeout=30");
+            SqlDataAdapter sda = new SqlDataAdapter("Select Count(*) From Login where Username='"+ username.Text + "' and Password = '" + password.Text + "'",con);
+            DataTable dt = new DataTable();
+            sda.Fill(dt);
+            if (dt.Rows[0][0].ToString() == "1")
+            {
+                MessageBox.Show("Wow!!!");
+            }*/
+            string ssid = username.Text, key = password.Text;
             if (!connect)
             {
-                if (textBox1.Text == null || textBox1.Text == "")
+                if (username.Text == null || username.Text == "")
                 {
                     MessageBox.Show("SSID cannot be left blank !",
                     "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -43,7 +95,7 @@ namespace WindowsFormsApplication1
                 else
                 {
 
-                    if (textBox2.Text == null || textBox2.Text == "")
+                    if (password.Text == null || password.Text == "")
                     {
                         MessageBox.Show("Key value cannot be left blank !",
                         "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -53,8 +105,8 @@ namespace WindowsFormsApplication1
                         if (key.Length >= 6)
                         {
                             Zedfi_Hotspot(ssid, key, true);
-                            textBox1.Enabled = false;
-                            textBox2.Enabled = false;
+                            username.Enabled = false;
+                            password.Enabled = false;
                             button1.Text = "Stop";
                             connect = true;
                         }
@@ -69,8 +121,8 @@ namespace WindowsFormsApplication1
             else
             {
                 Zedfi_Hotspot(null, null, false);
-                textBox1.Enabled = true;
-                textBox2.Enabled = true;
+                username.Enabled = true;
+                password.Enabled = true;
                 button1.Text = "Start";
                 connect = false;
             }
@@ -124,6 +176,54 @@ namespace WindowsFormsApplication1
             }
 
             System.Windows.Forms.Application.Exit();
+        }
+
+        private void save_Click(object sender, EventArgs e)
+        {
+            SqlConnection cn = new SqlConnection(global::WindowsFormsApplication1.Properties.Settings.Default.Database1ConnectionString);
+
+            try
+            {
+                string sql = "INSERT INTO History (Id,Ssid,[Key]) VALUES (1,'" + username.Text + "','" + password.Text + "')";
+                string sql2 = "UPDATE History SET Ssid='"+username.Text+"', [Key]='"+password.Text+"' WHERE Id=1;";
+                SqlCommand exeSql = new SqlCommand(sql, cn);
+                SqlCommand exeSql2 = new SqlCommand(sql2, cn);
+                cn.Open();
+                exeSql.ExecuteNonQuery();
+                exeSql2.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Errorz", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                cn.Close();
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            SqlConnection cn2 = new SqlConnection(global::WindowsFormsApplication1.Properties.Settings.Default.Database1ConnectionString);
+
+            try
+            {
+                string sql2 = "SELECT Ssid FROM History WHERE Id=1";
+                string sql3 = "SELECT [Key] FROM History WHERE Id=1";
+                SqlCommand exeSql2 = new SqlCommand(sql2, cn2);
+                SqlCommand exeSql3 = new SqlCommand(sql3, cn2);
+                cn2.Open();
+                username.Text = (string)exeSql2.ExecuteScalar();
+                password.Text = (string)exeSql3.ExecuteScalar();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                cn2.Close();
+            }
         }
 
     }
